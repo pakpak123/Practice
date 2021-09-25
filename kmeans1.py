@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from iris import knn
 
 def kmean(k):
     # initial centroids
@@ -17,6 +18,11 @@ def kmean(k):
         Cold = C.copy()
         for i in range(len(C)):
             C[i] = np.mean(Xtrain[j == i], axis=0)
+        plt.clf()
+        plt.plot(Xtrain[:, 0], Xtrain[:, 1], '.g')
+        plt.plot(C[:, 0], C[:, 1], 'or')
+        plt.draw()
+        plt.pause(1)
         if np.sum(np.abs(Cold - C)) == 0:
             return C
 
@@ -31,4 +37,14 @@ Xtest = df.iloc[itest, :-1].values
 Ytrain = df.iloc[itrain, -1].values
 Ytest = df.iloc[itest, -1].values
 C = kmean(3)
+L = []
+for c in C:
+    L.append(knn(c, Xtrain, Ytrain))
+L = np.array(L)
 print(C)
+print(L)
+Ztest = []
+for x in Xtest:
+    Ztest.append(knn(x, C, L))
+acc = np.sum(np.array(Ztest) == Ytest) / len(Xtest) * 100
+print(acc)
